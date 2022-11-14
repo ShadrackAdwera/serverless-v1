@@ -4,6 +4,8 @@ import {
   GetItemCommandInput,
   ScanCommand,
   ScanCommandInput,
+  QueryCommand,
+  QueryCommandInput,
   PutItemCommand,
   PutItemCommandInput,
   PutItemCommandOutput,
@@ -26,6 +28,40 @@ const getProductById = async (productId: string) => {
   try {
     const { Item } = await ddbClient.send(new GetItemCommand(params));
     return Item ? unmarshall(Item) : {};
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const getProductsByCategory = async (event: APIGatewayEvent) => {
+  let productId = '';
+  let category = '';
+  if (event.pathParameters && event.pathParameters.id) {
+    productId = event.pathParameters.id;
+  } else {
+    throw new Error('Provide the path params');
+  }
+
+  if (event.queryStringParameters && event.queryStringParameters.category) {
+    category = event.queryStringParameters.category;
+  } else {
+    throw new Error('Provide the query string params');
+  }
+
+  const params: QueryCommandInput = {
+    TableName: process.env.DYNAMODB_TABLE_NAME,
+    KeyConditionExpression: 'id = :productId',
+    FilterExpression: 'contains (category, :category)',
+    ExpressionAttributeValues: {
+      ':productId': { S: productId },
+      ':category': { S: category },
+    },
+  };
+
+  try {
+    const { Items } = await ddbClient.send(new QueryCommand(params));
+    return Items ? Items.map((Item) => unmarshall(Item)) : [];
   } catch (error) {
     console.error(error);
     throw error;
@@ -137,6 +173,7 @@ const deleteProduct = async (
 export {
   getProductById,
   getProducts,
+  getProductsByCategory,
   createProduct,
   deleteProduct,
   updateProduct,
