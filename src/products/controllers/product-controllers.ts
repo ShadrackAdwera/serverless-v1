@@ -66,6 +66,11 @@ const createProduct = async (
 const deleteProduct = async (
   productId: string
 ): Promise<DeleteItemCommandOutput> => {
+  const product = await getProductById(productId);
+  if (Object.keys(product).length === 0) {
+    throw new Error('This product does not exist!');
+  }
+
   const params: DeleteItemCommandInput = {
     TableName: process.env.DYNAMODB_TABLE_NAME,
     Key: marshall({ id: productId }),
