@@ -7,6 +7,9 @@ import {
   PutItemCommand,
   PutItemCommandInput,
   PutItemCommandOutput,
+  UpdateItemCommand,
+  UpdateItemCommandInput,
+  UpdateItemCommandOutput,
   DeleteItemCommand,
   DeleteItemCommandInput,
   DeleteItemCommandOutput,
@@ -63,6 +66,54 @@ const createProduct = async (
   }
 };
 
+const updateProduct = async (
+  event: APIGatewayEvent
+): Promise<UpdateItemCommandOutput> => {
+  let productId = '';
+  if (event.pathParameters && event.pathParameters.id) {
+    productId = event.pathParameters.id;
+  } else {
+    throw new Error('Please provide the ID for this product');
+  }
+  const product = await getProductById(productId);
+  if (Object.keys(product).length === 0) {
+    throw new Error('This product does not exist!');
+  }
+
+  const requestBody = JSON.parse(event.body!);
+  const objKeys = Object.keys(requestBody);
+
+  const params: UpdateItemCommandInput = {
+    TableName: process.env.DYNAMODB_TABLE_NAME,
+    Key: marshall({ id: productId }),
+    UpdateExpression: `SET ${objKeys
+      .map((_, index) => `#key${index} = :value${index}`)
+      .join(', ')}`,
+    ExpressionAttributeNames: objKeys.reduce(
+      (acc, key, index) => ({
+        ...acc,
+        [`#key${index}`]: key,
+      }),
+      {}
+    ),
+    ExpressionAttributeValues: marshall(
+      objKeys.reduce(
+        (acc, key, index) => ({
+          ...acc,
+          [`:value${index}`]: requestBody[key],
+        }),
+        {}
+      )
+    ),
+  };
+  try {
+    return await ddbClient.send(new UpdateItemCommand(params));
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 const deleteProduct = async (
   productId: string
 ): Promise<DeleteItemCommandOutput> => {
@@ -83,4 +134,10 @@ const deleteProduct = async (
   }
 };
 
-export { getProductById, getProducts, createProduct, deleteProduct };
+export {
+  getProductById,
+  getProducts,
+  createProduct,
+  deleteProduct,
+  updateProduct,
+};
