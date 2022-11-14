@@ -16,9 +16,9 @@ export class ServerlessV1Stack extends Stack {
     super(scope, id, props);
 
     const productTable = new Table(this, 'products', {
-      partitionKey: { name: 'id', type: AttributeType.STRING },
+      partitionKey: { name: 'id', type: AttributeType['STRING'] },
       tableName: 'products',
-      billingMode: BillingMode.PAY_PER_REQUEST,
+      billingMode: BillingMode['PAY_PER_REQUEST'],
       removalPolicy: RemovalPolicy['DESTROY'],
     });
 
