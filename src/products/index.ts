@@ -1,15 +1,32 @@
 import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
 
+import { getProductById, getProducts } from './controllers/product-controllers';
+
 exports.handler = async (
   event: APIGatewayEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> => {
-  console.log(`Event: ${JSON.stringify(event, null, 2)}`);
-  console.log(`Context: ${JSON.stringify(context, null, 2)}`);
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: `hello world you're at ${event.path} route.`,
-    }),
-  };
+  switch (event.httpMethod) {
+    case 'GET':
+      let productRes: Record<string, any>;
+      let productsRes: Record<string, any>[];
+      if (
+        event.pathParameters !== null &&
+        event.pathParameters.id !== undefined
+      ) {
+        productRes = await getProductById(event.pathParameters.id);
+      } else {
+        productsRes = await getProducts();
+      }
+    case 'POST':
+    case 'PATCH':
+    case 'DELETE':
+    default:
+      return {
+        statusCode: 404,
+        body: JSON.stringify({
+          message: 'Invalid method provided.',
+        }),
+      };
+  }
 };
