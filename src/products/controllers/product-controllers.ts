@@ -4,8 +4,13 @@ import {
   GetItemCommandInput,
   ScanCommand,
   ScanCommandInput,
+  PutItemCommand,
+  PutItemCommandInput,
+  PutItemCommandOutput,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { APIGatewayEvent } from 'aws-lambda';
+import { v4 as uuidv4 } from 'uuid';
 
 const getProductById = async (productId: string) => {
   const params: GetItemCommandInput = {
@@ -36,4 +41,23 @@ const getProducts = async () => {
   }
 };
 
-export { getProductById, getProducts };
+const createProduct = async (
+  event: APIGatewayEvent
+): Promise<PutItemCommandOutput> => {
+  const requestBody = JSON.parse(event.body!);
+  // TODO: configure validator
+  // TODO: enforce schema in dynamoDB
+  const params: PutItemCommandInput = {
+    TableName: process.env.DYNAMODB_TABLE_NAME,
+    Item: marshall({ ...requestBody, id: uuidv4() } || {}),
+  };
+  try {
+    const createResult = await ddbClient.send(new PutItemCommand(params));
+    return createResult;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export { getProductById, getProducts, createProduct };
