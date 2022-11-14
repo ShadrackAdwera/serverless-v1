@@ -7,6 +7,9 @@ import {
   PutItemCommand,
   PutItemCommandInput,
   PutItemCommandOutput,
+  DeleteItemCommand,
+  DeleteItemCommandInput,
+  DeleteItemCommandOutput,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { APIGatewayEvent } from 'aws-lambda';
@@ -60,4 +63,19 @@ const createProduct = async (
   }
 };
 
-export { getProductById, getProducts, createProduct };
+const deleteProduct = async (
+  productId: string
+): Promise<DeleteItemCommandOutput> => {
+  const params: DeleteItemCommandInput = {
+    TableName: process.env.DYNAMODB_TABLE_NAME,
+    Key: marshall({ id: productId }),
+  };
+  try {
+    return await ddbClient.send(new DeleteItemCommand(params));
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export { getProductById, getProducts, createProduct, deleteProduct };
