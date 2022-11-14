@@ -6,6 +6,7 @@ import {
   getProductById,
   getProducts,
   updateProduct,
+  getProductsByCategory,
 } from './controllers/product-controllers';
 
 exports.handler = async (
@@ -21,7 +22,9 @@ exports.handler = async (
   switch (event.httpMethod) {
     case 'GET':
       let productBody: Record<string, any> | Record<string, any>[];
-      if (
+      if (event.queryStringParameters !== null) {
+        productBody = await getProductsByCategory(event);
+      } else if (
         event.pathParameters !== null &&
         event.pathParameters.id !== undefined
       ) {
