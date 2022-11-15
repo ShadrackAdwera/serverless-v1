@@ -50,11 +50,12 @@ exports.handler = async (
         };
         break;
       case 'PATCH':
-        await updateProduct(event);
+        const updatedProduct = await updateProduct(event);
         apiResponse = {
           statusCode: 200,
           body: JSON.stringify({
             message: 'Product Updated',
+            product: updatedProduct,
           }),
         };
         break;
