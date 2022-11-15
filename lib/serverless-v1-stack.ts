@@ -39,7 +39,7 @@ export class ServerlessV1Stack extends Stack {
       ...nodeJsFnProps,
     });
 
-    productTable.grantReadData(productFn);
+    productTable.grantReadWriteData(productFn);
 
     const apiGateway = new LambdaRestApi(this, 'productsApi', {
       restApiName: 'Products Service API',
