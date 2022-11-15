@@ -1,9 +1,9 @@
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway';
-import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { IFunction } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 
 interface IServerlessV1ApiGatewayProps {
-  productFn: NodejsFunction;
+  productFn: IFunction;
 }
 
 export class ServerlessV1ApiGateway extends Construct {
