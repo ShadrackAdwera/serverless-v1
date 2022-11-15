@@ -20,6 +20,7 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { APIGatewayEvent } from 'aws-lambda';
 import { v4 as uuidv4 } from 'uuid';
 
+//TODO: Write unit tests for these controllers
 const getProductById = async (productId: string) => {
   const params: GetItemCommandInput = {
     TableName: process.env.DYNAMODB_TABLE_NAME,
@@ -89,6 +90,7 @@ const createProduct = async (
   const requestBody = JSON.parse(event.body!);
   // TODO: configure validator
   // TODO: enforce schema in dynamoDB
+  // TODO: Query S3 for a signed URL to put image into an s3 container and save the url to DynamoDB
   const params: PutItemCommandInput = {
     TableName: process.env.DYNAMODB_TABLE_NAME,
     Item: marshall({ ...requestBody, id: uuidv4() } || {}),
