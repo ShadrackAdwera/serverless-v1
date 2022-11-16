@@ -17,7 +17,7 @@ export class ServerlessV1Database extends Construct {
     this.checkOutTable = this.createCheckoutTable();
   }
 
-  createProductsTable(): ITable {
+  private createProductsTable(): ITable {
     const productsTable = new Table(this, 'products', {
       partitionKey: { name: 'id', type: AttributeType['STRING'] },
       tableName: 'products',
@@ -27,7 +27,7 @@ export class ServerlessV1Database extends Construct {
     return productsTable;
   }
 
-  createCheckoutTable(): ITable {
+  private createCheckoutTable(): ITable {
     const checkOutTable = new Table(this, 'check-out', {
       partitionKey: { name: 'username', type: AttributeType['STRING'] },
       tableName: 'check-out',
