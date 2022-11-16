@@ -13,21 +13,27 @@ export class ServerlessV1Database extends Construct {
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
-    // products dynamoDB table
-    const productsTable = new Table(scope, 'products', {
+    this.productsTable = this.createProductsTable();
+    this.checkOutTable = this.createCheckoutTable();
+  }
+
+  createProductsTable(): ITable {
+    const productsTable = new Table(this, 'products', {
       partitionKey: { name: 'id', type: AttributeType['STRING'] },
       tableName: 'products',
       billingMode: BillingMode['PAY_PER_REQUEST'],
       removalPolicy: RemovalPolicy['DESTROY'],
     });
-    // checkout dynamoDB table
-    const checkOutTable = new Table(scope, 'check-out', {
+    return productsTable;
+  }
+
+  createCheckoutTable(): ITable {
+    const checkOutTable = new Table(this, 'check-out', {
       partitionKey: { name: 'username', type: AttributeType['STRING'] },
       tableName: 'check-out',
       billingMode: BillingMode['PAY_PER_REQUEST'],
       removalPolicy: RemovalPolicy['DESTROY'],
     });
-    this.productsTable = productsTable;
-    this.checkOutTable = checkOutTable;
+    return checkOutTable;
   }
 }
