@@ -20,6 +20,7 @@ export class ServerlessV1Database extends Construct {
       billingMode: BillingMode['PAY_PER_REQUEST'],
       removalPolicy: RemovalPolicy['DESTROY'],
     });
+    // checkout dynamoDB table
     const checkOutTable = new Table(scope, 'check-out', {
       partitionKey: { name: 'username', type: AttributeType['STRING'] },
       tableName: 'check-out',
