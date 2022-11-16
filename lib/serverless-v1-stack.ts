@@ -12,6 +12,7 @@ export class ServerlessV1Stack extends Stack {
     const database = new ServerlessV1Database(this, 'Database');
     const microservice = new ServerlessV1Microservices(this, 'Microservice', {
       productsTable: database.productsTable,
+      checkOutTable: database.checkOutTable,
     });
     const apiGateway = new ServerlessV1ApiGateway(this, 'ApiGateway', {
       productFn: microservice.productFn,
