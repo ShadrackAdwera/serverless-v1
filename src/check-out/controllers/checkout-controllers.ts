@@ -3,8 +3,13 @@ import {
   ScanCommandInput,
   GetItemCommand,
   GetItemCommandInput,
+  PutItemCommand,
+  PutItemCommandInput,
+  DeleteItemCommand,
+  DeleteItemCommandInput,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { APIGatewayProxyEvent } from 'aws-lambda';
 import { ddbClient } from '../libs/ddbClient';
 
 const getCheckOutByUsername = async (username: string) => {
@@ -45,4 +50,46 @@ const getCheckOut = async () => {
   }
 };
 
-export { getCheckOutByUsername, getCheckOut };
+const createCheckoutBasket = async (event: APIGatewayProxyEvent) => {
+  const data = JSON.parse(event.body!);
+  const params: PutItemCommandInput = {
+    TableName: process.env.DYNAMODB_TABLE_NAME,
+    Item: marshall({ ...data } || {}),
+  };
+  try {
+    const { Attributes } = await ddbClient.send(new PutItemCommand(params));
+    return {
+      message: 'Checkout basket created',
+      data: Attributes,
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+const submitCheckouBasket = async () => {};
+
+const deleteCheckout = async (username: string) => {
+  const params: DeleteItemCommandInput = {
+    TableName: process.env.DYNAMODB_TABLE_NAME,
+    Key: marshall({ username }),
+  };
+  try {
+    await ddbClient.send(new DeleteItemCommand(params));
+    return {
+      message: 'Checkout deleted',
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export {
+  getCheckOutByUsername,
+  getCheckOut,
+  deleteCheckout,
+  createCheckoutBasket,
+  submitCheckouBasket,
+};
