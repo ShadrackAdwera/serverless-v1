@@ -45,11 +45,11 @@ export class ServerlessV1ApiGateway extends Construct {
     checkout.addMethod('GET'); // GET: /checkout
     checkout.addMethod('POST'); // POST create new checkout basket
 
-    const submitCheckout = checkout.addResource('submit-checkout'); // /checkout/submit-checkout
-    submitCheckout.addMethod('POST'); // submit checkout items to event bridge
-
     const checkoutItems = checkout.addResource('{username}'); // /basket/{username}
     checkoutItems.addMethod('GET');
     checkoutItems.addMethod('DELETE');
+
+    const submitCheckout = checkout.addResource('submit-checkout'); // /checkout/submit-checkout
+    submitCheckout.addMethod('POST'); // submit checkout items to event bridge
   }
 }

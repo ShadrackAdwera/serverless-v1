@@ -5,6 +5,7 @@ import { ServerlessV1Database } from './database/infrastructure';
 import { ServerlessV1Microservices } from './api/microservices';
 import { ServerlessV1ApiGateway } from './api/api-gateway';
 
+// class open for extension but closed for modification
 export class ServerlessV1Stack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);

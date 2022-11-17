@@ -1,14 +1,17 @@
 import { APIGatewayEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
-exports.handler = (
+exports.handler = async (
   event: APIGatewayEvent,
   context: Context
-): APIGatewayProxyResult => {
+): Promise<APIGatewayProxyResult> => {
   console.log(`Request: ${JSON.stringify(event, undefined, 2)}`);
   console.log(`Context: ${JSON.stringify(context, undefined, 2)}`);
 
   let apiResponse: APIGatewayProxyResult = {
     statusCode: 404,
+    headers: {
+      'Content-Type': 'application/json',
+    },
     body: JSON.stringify({
       message: `This method / route does not exist!`,
     }),
@@ -19,6 +22,9 @@ exports.handler = (
       case 'GET':
         apiResponse = {
           statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
             message: `Hello from check out lambda function`,
             path: `${event.path}`,
@@ -28,6 +34,9 @@ exports.handler = (
       case 'POST':
         apiResponse = {
           statusCode: 201,
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
             message: `Hello from check out lambda function`,
             path: `${event.path}`,
@@ -37,6 +46,9 @@ exports.handler = (
       case 'DELETE':
         apiResponse = {
           statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
             message: `Hello from check out lambda function`,
             path: `${event.path}`,
