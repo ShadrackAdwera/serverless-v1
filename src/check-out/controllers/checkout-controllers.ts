@@ -50,8 +50,8 @@ const getCheckOut = async () => {
   }
 };
 
-const createCheckoutBasket = async (event: APIGatewayProxyEvent) => {
-  const data = JSON.parse(event.body!);
+const createCheckoutBasket = async (body: string | null) => {
+  const data = JSON.parse(body!);
   const params: PutItemCommandInput = {
     TableName: process.env.DYNAMODB_TABLE_NAME,
     Item: marshall({ ...data } || {}),

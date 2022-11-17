@@ -2,6 +2,9 @@ import { APIGatewayEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import {
   getCheckOutByUsername,
   getCheckOut,
+  deleteCheckout,
+  createCheckoutBasket,
+  submitCheckouBasket,
 } from './controllers/checkout-controllers';
 
 exports.handler = async (
@@ -20,6 +23,14 @@ exports.handler = async (
       message: `This method / route does not exist!`,
     }),
   };
+
+  /*
+  GET /checkout
+  POST /checkout
+  GET /checkout/{username}
+  DELETE /checkout/{username}
+  POST /checkout/submit-checkout
+  */
 
   try {
     switch (event.httpMethod) {
@@ -41,29 +52,56 @@ exports.handler = async (
         }
         break;
       case 'POST':
-        apiResponse = {
-          statusCode: 201,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: `Hello from check out lambda function`,
-            path: `${event.path}`,
-            method: `${event.httpMethod}`,
-          }),
-        };
+        if (event.path === '/checkout/submit-checkout') {
+          await submitCheckouBasket();
+          apiResponse = {
+            statusCode: 201,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: `Checkout basket submitted`,
+            }),
+          };
+        } else {
+          await createCheckoutBasket(event.body);
+          apiResponse = {
+            statusCode: 201,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: `Checkout item created`,
+            }),
+          };
+        }
+        break;
       case 'DELETE':
-        apiResponse = {
-          statusCode: 200,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: `Hello from check out lambda function`,
-            path: `${event.path}`,
-            method: `${event.httpMethod}`,
-          }),
-        };
+        if (event.pathParameters && event.pathParameters.username) {
+          await deleteCheckout(event.pathParameters.username);
+          apiResponse = {
+            statusCode: 200,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: `The item has been deleted`,
+            }),
+          };
+        } else {
+          apiResponse = {
+            statusCode: 400,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: `Please provide a username`,
+            }),
+          };
+        }
+        break;
+      default:
+        return apiResponse;
     }
     return apiResponse;
   } catch (error) {
