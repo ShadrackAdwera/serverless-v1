@@ -28,7 +28,11 @@ const getProductById = async (productId: string) => {
   };
   try {
     const { Item } = await ddbClient.send(new GetItemCommand(params));
-    return Item ? unmarshall(Item) : {};
+    return Item
+      ? {
+          item: unmarshall(Item),
+        }
+      : {};
   } catch (error) {
     console.error(error);
     throw error;
@@ -62,7 +66,12 @@ const getProductsByCategory = async (event: APIGatewayEvent) => {
 
   try {
     const { Items } = await ddbClient.send(new QueryCommand(params));
-    return Items ? Items.map((Item) => unmarshall(Item)) : [];
+    return Items
+      ? {
+          count: Items.length,
+          items: Items.map((Item) => unmarshall(Item)),
+        }
+      : [];
   } catch (error) {
     console.error(error);
     throw error;
@@ -76,7 +85,10 @@ const getProducts = async () => {
   try {
     const { Items } = await ddbClient.send(new ScanCommand(params));
     return Items && Items?.length > 0
-      ? Items.map((Item) => unmarshall(Item))
+      ? {
+          count: Items.length,
+          items: Items.map((Item) => unmarshall(Item)),
+        }
       : [];
   } catch (error) {
     console.error(error);
