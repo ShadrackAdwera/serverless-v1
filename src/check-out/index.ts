@@ -1,4 +1,8 @@
 import { APIGatewayEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+import {
+  getCheckOutByUsername,
+  getCheckOut,
+} from './controllers/checkout-controllers';
 
 exports.handler = async (
   event: APIGatewayEvent,
@@ -20,17 +24,22 @@ exports.handler = async (
   try {
     switch (event.httpMethod) {
       case 'GET':
-        apiResponse = {
-          statusCode: 200,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: `Hello from check out lambda function`,
-            path: `${event.path}`,
-            method: `${event.httpMethod}`,
-          }),
-        };
+        if (event.pathParameters && event.pathParameters.username) {
+          const response = await getCheckOutByUsername(
+            event.pathParameters.username
+          );
+          apiResponse = {
+            statusCode: 200,
+            body: JSON.stringify(response),
+          };
+        } else {
+          const response = await getCheckOut();
+          apiResponse = {
+            statusCode: 200,
+            body: JSON.stringify(response),
+          };
+        }
+        break;
       case 'POST':
         apiResponse = {
           statusCode: 201,
