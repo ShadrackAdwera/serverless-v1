@@ -4,6 +4,7 @@ import { Construct } from 'constructs';
 
 interface IServerlessV1ApiGatewayProps {
   productFn: IFunction;
+  checkOutFn: IFunction;
 }
 
 export class ServerlessV1ApiGateway extends Construct {
@@ -13,13 +14,17 @@ export class ServerlessV1ApiGateway extends Construct {
     props: IServerlessV1ApiGatewayProps
   ) {
     super(scope, id);
+    this.createProductsApis(props.productFn);
+    this.createCheckoutApis(props.checkOutFn);
+  }
 
-    const apiGateway = new LambdaRestApi(this, 'productsApi', {
+  createProductsApis(productFn: IFunction): void {
+    const productsApiGateway = new LambdaRestApi(this, 'productsApis', {
       restApiName: 'Products Service API',
-      handler: props.productFn,
+      handler: productFn,
       proxy: false,
     });
-    const products = apiGateway.root.addResource('products');
+    const products = productsApiGateway.root.addResource('products');
     products.addMethod('GET'); // GET /products
     products.addMethod('POST'); // POST /products
 
@@ -28,5 +33,23 @@ export class ServerlessV1ApiGateway extends Construct {
     product.addMethod('GET'); // GET product by id
     product.addMethod('PATCH'); // PATCH update product
     product.addMethod('DELETE'); // DELETE delete product
+  }
+
+  createCheckoutApis(checkoutFn: IFunction): void {
+    const checkoutApiGateway = new LambdaRestApi(this, 'checkoutApis', {
+      restApiName: 'Checkout REST API',
+      handler: checkoutFn,
+      proxy: false,
+    });
+    const checkout = checkoutApiGateway.root.addResource('checkout');
+    checkout.addMethod('GET'); // GET: /checkout
+    checkout.addMethod('POST'); // POST create new checkout basket
+
+    const submitCheckout = checkout.addResource('submit-checkout'); // /checkout/submit-checkout
+    submitCheckout.addMethod('POST'); // submit checkout items to event bridge
+
+    const checkoutItems = checkout.addResource('{username}'); // /basket/{username}
+    checkoutItems.addMethod('GET');
+    checkoutItems.addMethod('DELETE');
   }
 }
