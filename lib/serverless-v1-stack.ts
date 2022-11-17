@@ -16,6 +16,7 @@ export class ServerlessV1Stack extends Stack {
     });
     const apiGateway = new ServerlessV1ApiGateway(this, 'ApiGateway', {
       productFn: microservice.productFn,
+      checkOutFn: microservice.checkoutFn,
     });
   }
 }
