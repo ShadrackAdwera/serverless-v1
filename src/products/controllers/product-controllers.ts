@@ -32,7 +32,7 @@ const getProductById = async (productId: string) => {
       ? {
           item: unmarshall(Item),
         }
-      : {};
+      : { message: 'This product does not exist' };
   } catch (error) {
     console.error(error);
     throw error;
@@ -71,7 +71,7 @@ const getProductsByCategory = async (event: APIGatewayEvent) => {
           count: Items.length,
           items: Items.map((Item) => unmarshall(Item)),
         }
-      : [];
+      : { message: 'No items found' };
   } catch (error) {
     console.error(error);
     throw error;
@@ -89,7 +89,7 @@ const getProducts = async () => {
           count: Items.length,
           items: Items.map((Item) => unmarshall(Item)),
         }
-      : [];
+      : { message: 'No items found' };
   } catch (error) {
     console.error(error);
     throw error;
