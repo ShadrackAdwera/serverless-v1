@@ -9,7 +9,6 @@ import {
   DeleteItemCommandInput,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
-import { APIGatewayProxyEvent } from 'aws-lambda';
 import { ddbClient } from '../libs/ddbClient';
 
 const getCheckOutByUsername = async (username: string) => {
@@ -23,7 +22,9 @@ const getCheckOutByUsername = async (username: string) => {
       ? {
           checkout: unmarshall(Item),
         }
-      : [];
+      : {
+          message: `No items found for ${username}`,
+        };
   } catch (error) {
     console.error(error);
     throw error;
