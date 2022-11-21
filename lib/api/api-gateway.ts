@@ -62,6 +62,8 @@ export class ServerlessV1ApiGateway extends Construct {
       proxy: false,
     });
     const orders = ordersApiGateway.root.addResource('orders');
-    orders.addMethod('GET'); // /orders
+    orders.addMethod('GET'); // GET: /orders
+    const orderByUsername = orders.addResource('{username}');
+    orderByUsername.addMethod('GET'); // GET: /orders/{username}
   }
 }
