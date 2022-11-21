@@ -20,7 +20,7 @@ export class ServerlessV1ApiGateway extends Construct {
     this.createOrdersApis(props.ordersFn);
   }
 
-  createProductsApis(productFn: IFunction): void {
+  private createProductsApis(productFn: IFunction): void {
     const productsApiGateway = new LambdaRestApi(this, 'productsApis', {
       restApiName: 'Products Service API',
       handler: productFn,
@@ -37,7 +37,7 @@ export class ServerlessV1ApiGateway extends Construct {
     product.addMethod('DELETE'); // DELETE delete product
   }
 
-  createCheckoutApis(checkoutFn: IFunction): void {
+  private createCheckoutApis(checkoutFn: IFunction): void {
     const checkoutApiGateway = new LambdaRestApi(this, 'checkoutApis', {
       restApiName: 'Checkout REST API',
       handler: checkoutFn,
@@ -55,7 +55,7 @@ export class ServerlessV1ApiGateway extends Construct {
     submitCheckout.addMethod('POST'); // submit checkout items to event bridge
   }
 
-  createOrdersApis(ordersFn: IFunction): void {
+  private createOrdersApis(ordersFn: IFunction): void {
     const ordersApiGateway = new LambdaRestApi(this, 'ordersApis', {
       restApiName: 'orders',
       handler: ordersFn,
