@@ -41,7 +41,8 @@ export class ServerlessV1Database extends Construct {
 
   private createOrdersTable(): ITable {
     const ordersTable = new Table(this, 'orders', {
-      partitionKey: { name: 'id', type: AttributeType['STRING'] },
+      partitionKey: { name: 'username', type: AttributeType['STRING'] },
+      sortKey: { name: 'orderDate', type: AttributeType['STRING'] },
       tableName: 'orders',
       billingMode: BillingMode['PAY_PER_REQUEST'],
       removalPolicy: RemovalPolicy['DESTROY'],
