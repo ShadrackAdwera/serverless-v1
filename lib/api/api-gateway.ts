@@ -5,6 +5,7 @@ import { Construct } from 'constructs';
 interface IServerlessV1ApiGatewayProps {
   productFn: IFunction;
   checkOutFn: IFunction;
+  ordersFn: IFunction;
 }
 
 export class ServerlessV1ApiGateway extends Construct {
@@ -16,6 +17,7 @@ export class ServerlessV1ApiGateway extends Construct {
     super(scope, id);
     this.createProductsApis(props.productFn);
     this.createCheckoutApis(props.checkOutFn);
+    this.createOrdersApis(props.ordersFn);
   }
 
   createProductsApis(productFn: IFunction): void {
@@ -51,5 +53,15 @@ export class ServerlessV1ApiGateway extends Construct {
 
     const submitCheckout = checkout.addResource('submit-checkout'); // /checkout/submit-checkout
     submitCheckout.addMethod('POST'); // submit checkout items to event bridge
+  }
+
+  createOrdersApis(ordersFn: IFunction): void {
+    const ordersApiGateway = new LambdaRestApi(this, 'ordersApis', {
+      restApiName: 'orders',
+      handler: ordersFn,
+      proxy: false,
+    });
+    const orders = ordersApiGateway.root.addResource('orders');
+    orders.addMethod('GET'); // /orders
   }
 }
