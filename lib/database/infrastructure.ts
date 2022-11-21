@@ -10,11 +10,13 @@ import {
 export class ServerlessV1Database extends Construct {
   public readonly productsTable: ITable;
   public readonly checkOutTable: ITable;
+  public readonly ordersTable: ITable;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
     this.productsTable = this.createProductsTable();
     this.checkOutTable = this.createCheckoutTable();
+    this.ordersTable = this.createOrdersTable();
   }
 
   private createProductsTable(): ITable {
@@ -35,5 +37,15 @@ export class ServerlessV1Database extends Construct {
       removalPolicy: RemovalPolicy['DESTROY'],
     });
     return checkOutTable;
+  }
+
+  private createOrdersTable(): ITable {
+    const ordersTable = new Table(this, 'orders', {
+      partitionKey: { name: 'id', type: AttributeType['STRING'] },
+      tableName: 'orders',
+      billingMode: BillingMode['PAY_PER_REQUEST'],
+      removalPolicy: RemovalPolicy['DESTROY'],
+    });
+    return ordersTable;
   }
 }
