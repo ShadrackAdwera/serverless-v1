@@ -78,7 +78,8 @@ export class ServerlessV1Microservices extends Construct {
       entry: path.join(__dirname, '/../../src/orders/index.ts'),
       environment: {
         DYNAMODB_TABLE_NAME: props.ordersTable.tableName,
-        PRIMARY_KEY: 'id',
+        PRIMARY_KEY: 'username',
+        SORT_KEY: 'orderDate',
       },
       ...this.getFnProps(),
     });
