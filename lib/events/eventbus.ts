@@ -18,14 +18,14 @@ export class ServerlessV1EventBus extends Construct {
     bus.grantPutEventsTo(props.publisherFunction);
   }
 
-  generateEventBus(): IEventBus {
+  private generateEventBus(): IEventBus {
     const eventBus = new EventBus(this, 'ServerlessV1EventBus', {
       eventBusName: 'ServerlessV1EventBus',
     });
     return eventBus;
   }
 
-  generateRule(): Rule {
+  private generateRule(): Rule {
     const rule = new Rule(this, 'ServerlessV1CheckoutRule', {
       eventBus: this.generateEventBus(),
       enabled: true,
