@@ -11,23 +11,24 @@ interface IEventBusProps {
 export class ServerlessV1EventBus extends Construct {
   constructor(scope: Construct, id: string, props: IEventBusProps) {
     super(scope, id);
+    // event bus
     const bus = this.generateEventBus();
-    const checkoutBasketRule = this.generateRule();
-    // this.orderingFn
-    checkoutBasketRule.addTarget(new LambdaFunction(props.targetFunction));
     bus.grantPutEventsTo(props.publisherFunction);
+    // rule
+    const checkoutBasketRule = this.generateRule(bus);
+    checkoutBasketRule.addTarget(new LambdaFunction(props.targetFunction));
   }
 
   private generateEventBus(): IEventBus {
-    const eventBus = new EventBus(this, 'ServerlessV1EventBus', {
-      eventBusName: 'ServerlessV1EventBus',
+    const eventBus = new EventBus(this, 'OrdersCheckoutEventBus', {
+      eventBusName: 'OrdersCheckoutEventBus',
     });
     return eventBus;
   }
 
-  private generateRule(): Rule {
+  private generateRule(bus: IEventBus): Rule {
     const rule = new Rule(this, 'ServerlessV1CheckoutRule', {
-      eventBus: this.generateEventBus(),
+      eventBus: bus,
       enabled: true,
       description: 'Handle check out events from checkout microservice',
       eventPattern: {
@@ -39,3 +40,16 @@ export class ServerlessV1EventBus extends Construct {
     return rule;
   }
 }
+
+/**
+ * SAMPLE EVENT
+ * [
+  { "Source": "com.serverless.checkout.items", 
+  "Detail": "{ "username": "abc", "item": "item 1" }", 
+  "Resources": ["resource1","resource2"], 
+  "DetailType": "CheckoutItems", 
+  "EventBusName":"OrdersCheckoutEventBus" 
+}
+  ]
+ * 
+ */
