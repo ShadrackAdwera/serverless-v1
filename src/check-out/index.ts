@@ -4,7 +4,7 @@ import {
   getCheckOut,
   deleteCheckout,
   createCheckoutBasket,
-  submitCheckouBasket,
+  submitCheckoutBasket,
 } from './controllers/checkout-controllers';
 
 exports.handler = async (
@@ -53,7 +53,7 @@ exports.handler = async (
         break;
       case 'POST':
         if (event.path === '/checkout/submit-checkout') {
-          await submitCheckouBasket();
+          await submitCheckoutBasket(event);
           apiResponse = {
             statusCode: 201,
             headers: {
