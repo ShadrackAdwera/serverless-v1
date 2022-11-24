@@ -47,7 +47,7 @@ export class ServerlessV1ApiGateway extends Construct {
     checkout.addMethod('GET'); // GET: /checkout
     checkout.addMethod('POST'); // POST create new checkout basket
 
-    const checkoutItems = checkout.addResource('{username}'); // /basket/{username}
+    const checkoutItems = checkout.addResource('{username}'); // /checkout/{username}
     checkoutItems.addMethod('GET');
     checkoutItems.addMethod('DELETE');
 
@@ -57,7 +57,7 @@ export class ServerlessV1ApiGateway extends Construct {
 
   private createOrdersApis(ordersFn: IFunction): void {
     const ordersApiGateway = new LambdaRestApi(this, 'ordersApis', {
-      restApiName: 'orders',
+      restApiName: 'Orders REST API',
       handler: ordersFn,
       proxy: false,
     });

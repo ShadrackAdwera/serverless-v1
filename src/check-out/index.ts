@@ -53,14 +53,14 @@ exports.handler = async (
         break;
       case 'POST':
         if (event.path === '/checkout/submit-checkout') {
-          await submitCheckoutBasket(event);
+          const { message } = await submitCheckoutBasket(event);
           apiResponse = {
             statusCode: 201,
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              message: `Checkout basket submitted`,
+              message,
             }),
           };
         } else {
@@ -106,6 +106,16 @@ exports.handler = async (
     return apiResponse;
   } catch (error) {
     console.error(error);
-    return apiResponse;
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: `${
+          error instanceof Error ? error.message : 'An error occured, try again'
+        }`,
+      }),
+    };
   }
 };

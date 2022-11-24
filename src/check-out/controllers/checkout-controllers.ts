@@ -36,7 +36,9 @@ const handleOrderPayload = (
 ): ICheckOutPayload => {
   try {
     let total = 0;
-    checkOutBasket.checkout.forEach(
+    if (checkOutBasket.items.length === 0)
+      throw new Error('Check out items do not exist!');
+    checkOutBasket.items.forEach(
       (item: { price: number }) => (total += item.price)
     );
     checkOutRequest.totalPrice = total;
@@ -163,6 +165,9 @@ const submitCheckoutBasket = async (event: APIGatewayEvent) => {
   // 4. delete basket item
   try {
     await deleteCheckout(payload.username);
+    return {
+      message: 'Items checked out successfully',
+    };
   } catch (error) {
     console.error(error);
     throw error;
