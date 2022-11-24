@@ -7,6 +7,11 @@ import {
 import { Construct } from 'constructs';
 
 import * as path from 'path';
+import {
+  EVENT_BUSNAME,
+  EVENT_DETAILTYPE,
+  EVENT_SOURCE,
+} from '../events/eventbus';
 
 interface IServerlessV1MicroserviceProps {
   productsTable: ITable;
@@ -63,6 +68,9 @@ export class ServerlessV1Microservices extends Construct {
       environment: {
         DYNAMODB_TABLE_NAME: props.checkOutTable.tableName,
         PRIMARY_KEY: 'username',
+        EVENT_SOURCE: EVENT_SOURCE,
+        EVENT_DETAILTYPE: EVENT_DETAILTYPE,
+        EVENT_BUSNAME: EVENT_BUSNAME,
       },
       ...this.getFnProps(),
     });

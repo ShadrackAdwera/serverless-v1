@@ -3,6 +3,10 @@ import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
 import { IFunction } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 
+export const EVENT_SOURCE = 'com.serverless.checkout.items';
+export const EVENT_DETAILTYPE = 'CheckoutItems';
+export const EVENT_BUSNAME = 'OrdersCheckoutEventBus';
+
 interface IEventBusProps {
   publisherFunction: IFunction;
   targetFunction: IFunction;
@@ -21,7 +25,7 @@ export class ServerlessV1EventBus extends Construct {
 
   private generateEventBus(): IEventBus {
     const eventBus = new EventBus(this, 'OrdersCheckoutEventBus', {
-      eventBusName: 'OrdersCheckoutEventBus',
+      eventBusName: EVENT_BUSNAME,
     });
     return eventBus;
   }
@@ -32,8 +36,8 @@ export class ServerlessV1EventBus extends Construct {
       enabled: true,
       description: 'Handle check out events from checkout microservice',
       eventPattern: {
-        source: ['com.serverless.checkout.items'],
-        detailType: ['CheckoutItems'],
+        source: [EVENT_SOURCE],
+        detailType: [EVENT_DETAILTYPE],
       },
       ruleName: 'ServerlessV1CheckoutRule',
     });
