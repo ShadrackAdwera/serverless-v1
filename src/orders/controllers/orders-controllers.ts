@@ -3,14 +3,13 @@ import {
   GetItemCommandInput,
   ScanCommand,
   ScanCommandInput,
+  PutItemCommand,
+  PutItemCommandInput,
 } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 
 import { ddbClient } from '../libs/ddbClient';
-
-// const createOrder = async () => {
-
-// }
+import { TOrder } from '../libs/types';
 
 const getOrders = async (username: string) => {
   const params: GetItemCommandInput = {
@@ -48,4 +47,26 @@ const getAllOrders = async () => {
   }
 };
 
-export { getOrders, getAllOrders };
+const createOrder = async (order: TOrder) => {
+  const orderDate = new Date().toISOString();
+  const foundOrder = { ...order };
+  foundOrder.orderDate = orderDate;
+  console.log(foundOrder);
+  const params: PutItemCommandInput = {
+    TableName: process.env.DYNAMODB_TABLE_NAME,
+    Item: marshall({ ...foundOrder } || {}),
+  };
+
+  try {
+    const result = await ddbClient.send(new PutItemCommand(params));
+    console.log(result);
+    return {
+      message: 'Order created successfully',
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export { getOrders, getAllOrders, createOrder };
