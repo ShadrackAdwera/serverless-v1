@@ -1,6 +1,6 @@
 import {
-  GetItemCommand,
-  GetItemCommandInput,
+  QueryCommand,
+  QueryCommandInput,
   ScanCommand,
   ScanCommandInput,
   PutItemCommand,
@@ -11,17 +11,26 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { ddbClient } from '../libs/ddbClient';
 import { TOrder } from '../libs/types';
 
-const getOrders = async (username: string) => {
-  const params: GetItemCommandInput = {
+const getOrdersByUserNameAndOrderDate = async (
+  username: string,
+  orderDate: string
+) => {
+  // request : xxx/order/:username?orderDate=:orderDate
+
+  const params: QueryCommandInput = {
     TableName: process.env.DYNAMODB_TABLE_NAME,
-    Key: marshall({ username }),
+    KeyConditionExpression: 'username = :username and orderDate = :orderDate',
+    ExpressionAttributeValues: {
+      ':username': { S: username },
+      ':orderDate': { S: orderDate },
+    },
   };
 
   try {
-    const { Item } = await ddbClient.send(new GetItemCommand(params));
-    return Item
+    const { Items } = await ddbClient.send(new QueryCommand(params));
+    return Items
       ? {
-          orders: unmarshall(Item),
+          orders: Items.map((item) => unmarshall(item)),
         }
       : {
           message: 'No orders found',
@@ -69,4 +78,4 @@ const createOrder = async (order: TOrder) => {
   }
 };
 
-export { getOrders, getAllOrders, createOrder };
+export { getOrdersByUserNameAndOrderDate, getAllOrders, createOrder };

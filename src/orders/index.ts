@@ -7,7 +7,7 @@ import {
 
 import {
   getAllOrders,
-  getOrders,
+  getOrdersByUserNameAndOrderDate,
   createOrder,
 } from './controllers/orders-controllers';
 import { TOrder } from './libs/types';
@@ -45,8 +45,16 @@ const apiGatewayInvocation = async (
   try {
     switch (event.httpMethod) {
       case 'GET':
-        if (event.pathParameters && event.pathParameters.username) {
-          const orders = await getOrders(event.pathParameters.username);
+        if (
+          event.pathParameters &&
+          event.pathParameters.username &&
+          event.queryStringParameters &&
+          event.queryStringParameters.orderDate
+        ) {
+          const orders = await getOrdersByUserNameAndOrderDate(
+            event.pathParameters.username,
+            event.queryStringParameters.orderDate
+          );
           apiResponse = {
             statusCode: 200,
             body: JSON.stringify({
