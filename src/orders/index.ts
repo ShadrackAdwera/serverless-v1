@@ -17,7 +17,7 @@ exports.handler = async (
   context: Context
 ): Promise<APIGatewayProxyResult> => {
   if ('detail-type' in event) {
-    await createOrder(event.detail);
+    await eventBridgeInvocation(event);
     return {
       statusCode: 201,
       body: JSON.stringify({
@@ -30,7 +30,8 @@ exports.handler = async (
 };
 
 const eventBridgeInvocation = async (event: EventBridgeEvent<any, TOrder>) => {
-  const basketItems = event.detail;
+  console.log(`Event Bridge Invokation event:`, event);
+  await createOrder(event.detail);
 };
 
 const apiGatewayInvocation = async (
