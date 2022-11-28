@@ -15,7 +15,7 @@ const getOrdersByUserNameAndOrderDate = async (
   username: string,
   orderDate: string
 ) => {
-  // request : xxx/order/:username?orderDate=:orderDate
+  // request : base-url/order/:username?orderDate=:orderDate
 
   const params: QueryCommandInput = {
     TableName: process.env.DYNAMODB_TABLE_NAME,
