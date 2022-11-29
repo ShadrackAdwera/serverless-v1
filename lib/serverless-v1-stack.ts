@@ -5,6 +5,7 @@ import { ServerlessV1Database } from './database/infrastructure';
 import { ServerlessV1Microservices } from './api/microservices';
 import { ServerlessV1ApiGateway } from './api/api-gateway';
 import { ServerlessV1EventBus } from './events/eventbus';
+import { ServerlessV1Queue } from './events/queue';
 
 // class open for extension but closed for modification
 export class ServerlessV1Stack extends Stack {
@@ -17,15 +18,19 @@ export class ServerlessV1Stack extends Stack {
       checkOutTable: database.checkOutTable,
       ordersTable: database.ordersTable,
     });
-    const apiGateway = new ServerlessV1ApiGateway(this, 'ApiGateway', {
+    new ServerlessV1ApiGateway(this, 'ApiGateway', {
       productFn: microservice.productFn,
       checkOutFn: microservice.checkoutFn,
       ordersFn: microservice.ordersFn,
     });
 
-    const eventBus = new ServerlessV1EventBus(this, 'EventBus', {
+    const queue = new ServerlessV1Queue(this, 'OrdersQueue', {
+      consumer: microservice.ordersFn,
+    });
+
+    new ServerlessV1EventBus(this, 'EventBus', {
       publisherFunction: microservice.checkoutFn,
-      targetFunction: microservice.ordersFn,
+      target: queue.orderQueue,
     });
   }
 }
