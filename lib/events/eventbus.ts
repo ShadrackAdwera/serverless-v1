@@ -1,6 +1,7 @@
 import { EventBus, IEventBus, Rule } from 'aws-cdk-lib/aws-events';
-import { LambdaFunction } from 'aws-cdk-lib/aws-events-targets';
+import { LambdaFunction, SqsQueue } from 'aws-cdk-lib/aws-events-targets';
 import { IFunction } from 'aws-cdk-lib/aws-lambda';
+import { IQueue } from 'aws-cdk-lib/aws-sqs';
 import { Construct } from 'constructs';
 
 export const EVENT_SOURCE = 'com.serverless.checkout.items';
@@ -9,7 +10,7 @@ export const EVENT_BUSNAME = 'OrdersCheckoutEventBus';
 
 interface IEventBusProps {
   publisherFunction: IFunction;
-  targetFunction: IFunction;
+  target: IQueue;
 }
 
 export class ServerlessV1EventBus extends Construct {
@@ -20,7 +21,7 @@ export class ServerlessV1EventBus extends Construct {
     bus.grantPutEventsTo(props.publisherFunction);
     // rule
     const checkoutBasketRule = this.generateRule(bus);
-    checkoutBasketRule.addTarget(new LambdaFunction(props.targetFunction));
+    checkoutBasketRule.addTarget(new SqsQueue(props.target));
   }
 
   private generateEventBus(): IEventBus {
