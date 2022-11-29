@@ -3,6 +3,7 @@ import {
   APIGatewayProxyResult,
   Context,
   EventBridgeEvent,
+  SQSEvent,
 } from 'aws-lambda';
 
 import {
@@ -13,7 +14,7 @@ import {
 import { TOrder } from './libs/types';
 
 exports.handler = async (
-  event: APIGatewayEvent | EventBridgeEvent<any, TOrder>,
+  event: APIGatewayEvent | EventBridgeEvent<any, TOrder> | SQSEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> => {
   if ('detail-type' in event) {
@@ -24,8 +25,26 @@ exports.handler = async (
         message: 'Order placed!',
       }),
     };
+  } else if ('Records' in event) {
+    await handleSqsEvent(event);
+    return {
+      statusCode: 201,
+      body: JSON.stringify({
+        message: 'Order placed!',
+      }),
+    };
   } else {
     return await apiGatewayInvocation(event);
+  }
+};
+
+const handleSqsEvent = async (event: SQSEvent) => {
+  console.log('SQS Event: ', event.Records);
+
+  for (const record of event.Records) {
+    console.log('SQS Record: ', record);
+    const data = JSON.parse(record.body) as TOrder;
+    await createOrder(data);
   }
 };
 
